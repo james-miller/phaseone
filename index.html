@@ -1,1 +1,110 @@
-WHADDUPPP!!!!!!!
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>hello phaser!</title>
+        <script src="/phaser/build/phaser.min.js"></script>
+        <script src="/js/mazeGenerator.js"></script>
+        <link rel="stylesheet" href="/css/style.css"/>
+    </head>
+    <body>
+    <script type="text/javascript">
+
+    var greenDot;
+    var currentPosition = {
+        x: 0.0,
+        y: 0.0
+    };
+    var targetDestination = {
+        x: 0.0,
+        y: 0.0
+    };
+
+    function move(direction, squares) {
+        var moves = {
+            east: function() {
+                targetDestination = {
+                    x: currentPosition.x + (squares * 32.0),
+                    y: currentPosition.y
+                };
+                greenDot.body.velocity.x = 50;
+            },
+            south: function() {
+                targetDestination = {
+                    x: currentPosition.x,
+                    y: currentPosition.y + (squares * 32.0)
+                };
+                greenDot.body.velocity.y = 50;
+            },
+            west: function() {
+                targetDestination = {
+                    x: currentPosition.x - (squares * 32.0),
+                    y: currentPosition.y
+                };
+                greenDot.body.velocity.x = -50;
+            },
+            north: function() {
+                targetDestination = {
+                    x: currentPosition.x,
+                    y: currentPosition.y - (squares * 32.0)
+                };
+                greenDot.body.velocity.y = -50;
+            }
+        }
+        moves[direction]();
+    }
+
+    window.onload = function() {
+
+        var map;
+        var layer;
+
+        var score = 0;
+        var scoreText;
+
+        var game = new Phaser.Game(800, 600, Phaser.AUTO, 'maze-game-area', { preload: preload, create: create, update: update });
+
+        function preload() {
+            
+            game.load.tilemap('maze', 'images/tiles/maze_test1.json', null, Phaser.Tilemap.TILED_JSON);
+            game.load.tilemap('themaze', null, theMaze(), Phaser.Tilemap.TILED_JSON);
+            game.load.spritesheet('greenDot', 'images/greenDot.png', 32, 32);
+            game.load.image('basic_all', '/images/tiles/basic_all.png');
+        }
+
+        function create() {
+            map = game.add.tilemap('themaze');
+            map.addTilesetImage('Tiles', 'basic_all');
+
+            layer = map.createLayer('MazeGrid');
+            layer.resizeWorld();
+
+            greenDot = game.add.sprite(0, 0, 'greenDot');
+            greenDot.animations.add('splat', [1], 100, true);
+            
+            game.physics.arcade.enable(greenDot);
+
+            //moveEast('', 6);
+        }
+
+        function update() {
+            currentPosition = {
+                x: Math.floor(greenDot.body.x),
+                y: Math.floor(greenDot.body.y)
+            };
+            if (currentPosition.x === targetDestination.x && currentPosition.y === targetDestination.y) {
+                greenDot.body.velocity.x = 0;
+                greenDot.body.velocity.y = 0;
+            }
+        }
+
+    };
+
+    </script>
+
+    <div class="game-area" id="maze-game-area">
+
+    </div>
+
+    </body>
+</html>
